@@ -82,6 +82,10 @@
     <div class="col-md-2 themed-grid-col bg-light">about.min.htm</div>
     <div class="col-md-6 themed-grid-col bg-light" id="about">Checking...</div>
   </div>
+  <div class="row mb-3">
+    <div class="col-md-2 themed-grid-col bg-light">certs.ar</div>
+    <div class="col-md-6 themed-grid-col bg-light" id="certs">Checking...</div>
+  </div>
 
   <div class="row mb-3">
     <form action="/api/upload" method="post" enctype="multipart/form-data">
@@ -137,6 +141,10 @@ function getUpload() {
       else
         $("#about").text("File is missing.");
 
+        if( cfg["certs"] )
+        $("#certs").text("Completed.");
+      else
+        $("#certs").text("File is missing (optional).");
 
     })
     .fail(function () {

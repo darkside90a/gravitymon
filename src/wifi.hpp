@@ -26,18 +26,23 @@ SOFTWARE.
 
 // Include
 #include <Arduino.h>
+#include <CertStoreBearSSL.h>
 
 // classes
 class WifiConnection {
  private:
+  // SSL
+   BearSSL::CertStore _certStore;
+   int _certCount = 0;
+
   // WIFI
+  void connectAsync();
+  bool waitForConnection(int maxTime = 20);
 
   // OTA
   bool newFirmware = false;
   bool parseFirmwareVersionString(int (&num)[3], const char *version);
   void downloadFile(const char *fname);
-  void connectAsync();
-  bool waitForConnection(int maxTime = 20);
 
  public:
   // WIFI
@@ -52,6 +57,12 @@ class WifiConnection {
   String getIPAddress();
   void startPortal();
   void loop();
+
+  // SSL
+  void initCertstore();
+  BearSSL::CertStore* getCertStore() { return &_certStore; }
+  int  getCertCount() { return _certCount; }
+  void initNTP();
 
   // OTA
   bool updateFirmware();

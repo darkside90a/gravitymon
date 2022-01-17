@@ -180,6 +180,16 @@ void setup() {
       break;
   }
 
+  // Check if we need SSL for any of the push targets
+  if (myConfig.isHttpSecure() || myConfig.isHttpSecure2() || myConfig.isMqttSecure()) {
+    LOG_PERF_START("main-cert-store");
+    myWifi.initCertstore();
+    LOG_PERF_STOP("main-cert-store");
+    LOG_PERF_START("main-cert-ntp");
+    myWifi.initNTP();
+    LOG_PERF_STOP("main-cert-ntp");
+  }
+
   LOG_PERF_STOP("main-setup");
   Log.notice(F("Main: Setup completed." CR));
   stableGyroMillis = millis();  // Dont include time for wifi connection

@@ -21,11 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#include <pushtarget.hpp>
 #include <MQTT.h>
-
 #include <config.hpp>
 #include <gyro.hpp>
-#include <pushtarget.hpp>
+#include <wifi.hpp>
 
 PushTarget myPushTarget;
 
@@ -243,10 +243,24 @@ void PushTarget::sendHttp(String serverPath, float angle, float gravity,
   createIspindleFormat(doc, angle, gravity, corrGravity, temp, runTime);
 
   WiFiClient client;
+  WiFiClientSecure clientSecure;
   HTTPClient http;
 
-  // Your Domain name with URL path or IP address with path
-  http.begin(client, serverPath);
+  if (serverPath.startsWith("https://")) {
+    /*if (myWifi.getCertCount() > 0) {
+      // Allow secure channel, with CA validation
+      clientSecure.setCertStore(myWifi.getCertStore());
+      Log.notice(F("PUSH: SSL enabled using certificate store." CR));
+    } else*/ {
+      // Allow secure channel, but without certificate validation
+      clientSecure.setInsecure();               
+      Log.notice(F("PUSH: SSL enabled without validation." CR));
+    }
+    http.begin(clientSecure, serverPath);
+  } else {
+    http.begin(client, serverPath);
+  }
+
   String json;
   serializeJson(doc, json);
 #if LOG_LEVEL == 6 && !defined(PUSH_DISABLE_LOGGING)
@@ -283,9 +297,26 @@ void PushTarget::sendMqtt(float angle, float gravity, float corrGravity,
   createIspindleFormat(doc, angle, gravity, corrGravity, temp, runTime);
 
   WiFiClient client;
-  MQTTClient mqtt(512);  // Maximum message size
+  WiFiClientSecure clientSecure;
+  MQTTClient mqtt(512); // Maximum message size
 
-  mqtt.begin(myConfig.getMqttUrl(), client);
+  if (myConfig.isMqttSecure()) {
+    if (myWifi.getCertCount() > 0) {
+      // Allow secure channel, with CA validation
+      clientSecure.setCertStore(myWifi.getCertStore());
+      Log.notice(F("PUSH: SSL enabled using certificate store." CR));
+    } else {
+      // Allow secure channel, but without certificate validation
+      clientSecure.setInsecure();               
+      Log.notice(F("PUSH: SSL enabled without validation." CR));
+    }
+    String url = myConfig.getMqttUrl();
+    url.replace(":8883", "");
+    mqtt.begin(url.c_str(), 8883, clientSecure);
+  } else {
+    mqtt.begin(myConfig.getMqttUrl(), client);
+  }
+
   mqtt.connect(myConfig.getMDNS(), myConfig.getMqttUser(),
                myConfig.getMqttPass());
 

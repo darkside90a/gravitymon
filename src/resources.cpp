@@ -32,12 +32,9 @@ INCBIN(DeviceHtm, "data/device.min.htm");
 INCBIN(ConfigHtm, "data/config.min.htm");
 INCBIN(CalibrationHtm, "data/calibration.min.htm");
 INCBIN(AboutHtm, "data/about.min.htm");
-
-#else
-
-// Minium web interface for uploading htm files
-INCBIN(UploadHtm, "data/upload.min.htm");
-
 #endif
+
+// Minium web interface for uploading htm files, also used to upload certificate store.
+INCBIN(UploadHtm, "data/upload.min.htm");
 
 // EOF

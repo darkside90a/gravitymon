@@ -33,6 +33,7 @@ SOFTWARE.
 #include <helper.hpp>
 #include <tempsensor.hpp>
 #include <wifi.hpp>
+#warning "Implement SSL for OTA"
 
 // Settings for DRD
 #define ESP_DRD_USE_LITTLEFS true
@@ -69,6 +70,31 @@ const char *userSSID = USER_SSID;
 const char *userPWD = USER_SSID_PWD;
 
 const int PIN_LED = 2;
+
+//
+// Initialize the certificate store
+//
+void WifiConnection::initCertstore() {
+  _certCount = _certStore.initCertStore(LittleFS, "/certs.idx", "/certs.ar");
+  Log.notice(F("WIFI: Number of CA certs read: %d." CR), _certCount);
+}
+
+// Set time via NTP, as required for x.509 validation
+void WifiConnection::initNTP() {
+  configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  Log.notice(F("WIFI: Waiting for NTP time sync." CR));
+  time_t now = time(nullptr);
+  while (now < 8 * 3600 * 2) {
+    delay(500);
+    Serial.print(".");
+    now = time(nullptr);
+  }
+  Serial.println();
+  struct tm timeinfo;
+  gmtime_r(&now, &timeinfo);
+  Log.notice(F("WIFI: Current time %s." CR), asctime(&timeinfo));
+}
 
 //
 // Constructor

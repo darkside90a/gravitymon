@@ -37,9 +37,8 @@ INCBIN_EXTERN(DeviceHtm);
 INCBIN_EXTERN(ConfigHtm);
 INCBIN_EXTERN(CalibrationHtm);
 INCBIN_EXTERN(AboutHtm);
-#else
-INCBIN_EXTERN(UploadHtm);
 #endif
+INCBIN_EXTERN(UploadHtm);
 
 // classes
 class WebServer {
@@ -86,12 +85,11 @@ class WebServer {
   void webReturnAboutHtm() {
     server->send_P(200, "text/html", (const char*)gAboutHtmData, gAboutHtmSize);
   }
-#else
+#endif
   void webReturnUploadHtm() {
     server->send_P(200, "text/html", (const char*)gUploadHtmData,
                    gUploadHtmSize);
   }
-#endif
 
  public:
   enum HtmlFile {
@@ -99,7 +97,8 @@ class WebServer {
     HTML_DEVICE = 1,
     HTML_CONFIG = 2,
     HTML_ABOUT = 3,
-    HTML_CALIBRATION = 4
+    HTML_CALIBRATION = 4,
+    CA_CERTS = 5
   };
 
   bool setupWebServer();

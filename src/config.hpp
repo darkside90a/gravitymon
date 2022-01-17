@@ -89,6 +89,7 @@ SOFTWARE.
 #define CFG_PARAM_BATTERY "battery"
 #define CFG_PARAM_SLEEP_MODE "sleep-mode"
 #define CFG_PARAM_RSSI "rssi"
+#define CFG_PARAM_CERTS "certs"
 
 // Used for holding sensordata or sensoroffsets
 struct RawGyroData {
@@ -179,6 +180,7 @@ class Config {
     saveNeeded = true;
   }
   bool isOtaActive() { return otaURL.length() ? true : false; }
+  bool isOtaSecure() { return otaURL.startsWith("https://"); }
 
   const char* getWifiSSID() { return wifiSSID.c_str(); }
   void setWifiSSID(String s) {
@@ -208,12 +210,14 @@ class Config {
     saveNeeded = true;
   }
   bool isHttpActive() { return httpPushUrl.length() ? true : false; }
+  bool isHttpSecure() { return httpPushUrl.startsWith("https://"); }
   const char* getHttpPushUrl2() { return httpPushUrl2.c_str(); }
   void setHttpPushUrl2(String s) {
     httpPushUrl2 = s;
     saveNeeded = true;
   }
   bool isHttpActive2() { return httpPushUrl2.length() ? true : false; }
+  bool isHttpSecure2() { return httpPushUrl2.startsWith("https://"); }
 
   // InfluxDB2
   const char* getInfluxDb2PushUrl() { return influxDb2Url.c_str(); }
@@ -240,6 +244,7 @@ class Config {
 
   // MQTT
   bool isMqttActive() { return mqttUrl.length() ? true : false; }
+  bool isMqttSecure() { return mqttUrl.endsWith(":8883"); }
   const char* getMqttUrl() { return mqttUrl.c_str(); }
   void setMqttUrl(String s) {
     mqttUrl = s;

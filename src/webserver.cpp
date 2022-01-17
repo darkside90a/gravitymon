@@ -49,6 +49,7 @@ void WebServer::webHandleDevice() {
   doc[CFG_PARAM_APP_NAME] = CFG_APPNAME;
   doc[CFG_PARAM_APP_VER] = CFG_APPVER;
   doc[CFG_PARAM_MDNS] = myConfig.getMDNS();
+  doc[CFG_PARAM_CERTS] = checkHtmlFile(CA_CERTS);
 #if LOG_LEVEL == 6
   serializeJson(doc, Serial);
   Serial.print(CR);
@@ -108,6 +109,7 @@ void WebServer::webHandleUpload() {
   doc["config"] = myWebServer.checkHtmlFile(WebServer::HTML_CONFIG);
   doc["calibration"] = myWebServer.checkHtmlFile(WebServer::HTML_CALIBRATION);
   doc["about"] = myWebServer.checkHtmlFile(WebServer::HTML_ABOUT);
+  doc["certs"] = myWebServer.checkHtmlFile(WebServer::CA_CERTS);
 
 #if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
   serializeJson(doc, Serial);
@@ -134,7 +136,8 @@ void WebServer::webHandleUploadFile() {
       f.equalsIgnoreCase("device.min.htm") ||
       f.equalsIgnoreCase("calibration.min.htm") ||
       f.equalsIgnoreCase("config.min.htm") ||
-      f.equalsIgnoreCase("about.min.htm")) {
+      f.equalsIgnoreCase("about.min.htm") ||
+      f.equalsIgnoreCase("certs.ar")) {
     validFilename = true;
   }
 
@@ -587,6 +590,8 @@ const char* WebServer::getHtmlFileName(HtmlFile item) {
       return "calibration.min.htm";
     case HTML_ABOUT:
       return "about.min.htm";
+    case CA_CERTS:
+      return "certs.ar";
   }
 
   return "";
@@ -636,6 +641,7 @@ bool WebServer::setupWebServer() {
   server->on("/calibration.htm",
              std::bind(&WebServer::webReturnCalibrationHtm, this));
   server->on("/about.htm", std::bind(&WebServer::webReturnAboutHtm, this));
+  server->on("/upload.htm", std::bind(&WebServer::webReturnUploadHtm, this));
 #else
   // Show files in the filessytem at startup
 
