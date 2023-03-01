@@ -37,7 +37,6 @@ ESP_WMParameter::ESP_WMParameter(const char* custom) {
   _WMParam_data._length = 0;
   _WMParam_data._value = NULL;
   _WMParam_data._labelPlacement = WFM_LABEL_BEFORE;
-
   _customHTML = custom;
 }
 
@@ -60,7 +59,6 @@ void ESP_WMParameter::init(const char* id, const char* placeholder,
   _WMParam_data._placeholder = placeholder;
   _WMParam_data._length = length;
   _WMParam_data._labelPlacement = labelPlacement;
-
   _WMParam_data._value = new char[_WMParam_data._length + 1];
 
   if (_WMParam_data._value != NULL) {
@@ -73,36 +71,6 @@ void ESP_WMParameter::init(const char* id, const char* placeholder,
 
   _customHTML = custom;
 }
-
-ESP_WMParameter::~ESP_WMParameter() {
-  if (_WMParam_data._value != NULL) {
-    delete[] _WMParam_data._value;
-  }
-}
-
-void ESP_WMParameter::setWMParam_Data(const WMParam_Data& WMParam_data) {
-  memcpy(&_WMParam_data, &WMParam_data, sizeof(_WMParam_data));
-}
-
-void ESP_WMParameter::getWMParam_Data(WMParam_Data& WMParam_data) {
-  memcpy(&WMParam_data, &_WMParam_data, sizeof(WMParam_data));
-}
-
-const char* ESP_WMParameter::getValue() { return _WMParam_data._value; }
-
-const char* ESP_WMParameter::getID() { return _WMParam_data._id; }
-
-const char* ESP_WMParameter::getPlaceholder() {
-  return _WMParam_data._placeholder;
-}
-
-int ESP_WMParameter::getValueLength() { return _WMParam_data._length; }
-
-int ESP_WMParameter::getLabelPlacement() {
-  return _WMParam_data._labelPlacement;
-}
-
-const char* ESP_WMParameter::getCustomHTML() { return _customHTML; }
 
 ESP_WMParameter** ESP_WiFiManager::getParameters() { return _params; }
 
@@ -163,7 +131,7 @@ ESP_WiFiManager::~ESP_WiFiManager() {
   }
 
   if (networkIndices) {
-    free(networkIndices); 
+    free(networkIndices);
   }
 }
 
@@ -193,7 +161,7 @@ bool ESP_WiFiManager::addParameter(ESP_WMParameter* p) {
 }
 
 void ESP_WiFiManager::setupConfigPortal() {
-  stopConfigPortal = false; 
+  stopConfigPortal = false;
 
   if (WiFi.getAutoConnect() == 0) WiFi.setAutoConnect(1);
 
@@ -387,14 +355,6 @@ bool ESP_WiFiManager::startConfigPortal(char const* apName,
 
         break;
       }
-
-      if (_shouldBreakAfterConfig) {
-        if (_savecallback != NULL) {
-          _savecallback();
-        }
-
-        break;
-      }
     }
 
     if (stopConfigPortal) {
@@ -490,14 +450,7 @@ int ESP_WiFiManager::connectWifi(const String& ssid, const String& pass) {
   }
 
   int connRes = waitForConnectResult();
-
   Log.notice(F("WM  : Connection result: %s" CR), getStatus(connRes));
-
-  if (_tryWPS && connRes != WL_CONNECTED && pass == "") {
-    startWPS();
-    connRes = waitForConnectResult();
-  }
-
   return connRes;
 }
 
@@ -536,40 +489,22 @@ uint8_t ESP_WiFiManager::waitForConnectResult() {
   }
 }
 
-void ESP_WiFiManager::startWPS() {
-#ifdef ESP8266
-  WiFi.beginWPSConfig();
-#else  // ESP32
-  // TODO
-  Log.verbose(F("WM  : ESP32 WPS TODO" CR));
-#endif
-}
-
 const char* ESP_WiFiManager::getStatus(const int& status) {
   switch (status) {
     case WL_IDLE_STATUS:
-      return "WL_IDLE_STATUS";
-
+    return "WL_IDLE_STATUS";
     case WL_NO_SSID_AVAIL:
-      return "WL_NO_SSID_AVAIL";
-
+    return "WL_NO_SSID_AVAIL";
     case WL_CONNECTED:
-      return "WL_CONNECTED";
-
+    return "WL_CONNECTED";
     case WL_CONNECT_FAILED:
-      return "WL_CONNECT_FAILED";
-
+    return "WL_CONNECT_FAILED";
     case WL_DISCONNECTED:
-      return "WL_DISCONNECTED";
-
+    return "WL_DISCONNECTED";
     default:
-      return "UNKNOWN";
+    return "UNKNOWN";
   }
 }
-
-String ESP_WiFiManager::getConfigPortalSSID() { return _apName; }
-
-String ESP_WiFiManager::getConfigPortalPW() { return _apPassword; }
 
 void ESP_WiFiManager::resetSettings() {
 #ifdef ESP8266
@@ -594,8 +529,6 @@ void ESP_WiFiManager::setConnectTimeout(const uint32_t& seconds) {
   _connectTimeout = seconds * 1000;
 }
 
-void ESP_WiFiManager::setDebugOutput(bool debug) { _debug = debug; }
-
 int ESP_WiFiManager::setConfigPortalChannel(const int& channel) {
   if ((channel < MIN_WIFI_CHANNEL - 1) || (channel > MAX_WIFI_CHANNEL))
     _WiFiAPChannel = 1;
@@ -608,7 +541,6 @@ int ESP_WiFiManager::setConfigPortalChannel(const int& channel) {
 void ESP_WiFiManager::setAPStaticIPConfig(const IPAddress& ip,
                                           const IPAddress& gw,
                                           const IPAddress& sn) {
-  // Log.verbose(F("WM  : setAPStaticIPConfig" CR));
   _WiFi_AP_IPconfig._ap_static_ip = ip;
   _WiFi_AP_IPconfig._ap_static_gw = gw;
   _WiFi_AP_IPconfig._ap_static_sn = sn;
@@ -616,15 +548,11 @@ void ESP_WiFiManager::setAPStaticIPConfig(const IPAddress& ip,
 
 void ESP_WiFiManager::setAPStaticIPConfig(
     const WiFi_AP_IPConfig& WM_AP_IPconfig) {
-  // Log.verbose(F("WM  : setAPStaticIPConfig" CR));
-
   memcpy(reinterpret_cast<void*>(&_WiFi_AP_IPconfig), &WM_AP_IPconfig,
          sizeof(_WiFi_AP_IPconfig));
 }
 
 void ESP_WiFiManager::getAPStaticIPConfig(WiFi_AP_IPConfig& WM_AP_IPconfig) {
-  // Log.verbose(F("WM  : getAPStaticIPConfig" CR));
-
   memcpy(reinterpret_cast<void*>(&WM_AP_IPconfig), &_WiFi_AP_IPconfig,
          sizeof(WM_AP_IPconfig));
 }
@@ -632,7 +560,6 @@ void ESP_WiFiManager::getAPStaticIPConfig(WiFi_AP_IPConfig& WM_AP_IPconfig) {
 void ESP_WiFiManager::setSTAStaticIPConfig(const IPAddress& ip,
                                            const IPAddress& gw,
                                            const IPAddress& sn) {
-  // Log.verbose(F("WM  : setSTAStaticIPConfig" CR));
   _WiFi_STA_IPconfig._sta_static_ip = ip;
   _WiFi_STA_IPconfig._sta_static_gw = gw;
   _WiFi_STA_IPconfig._sta_static_sn = sn;
@@ -640,26 +567,18 @@ void ESP_WiFiManager::setSTAStaticIPConfig(const IPAddress& ip,
 
 void ESP_WiFiManager::setSTAStaticIPConfig(
     const WiFi_STA_IPConfig& WM_STA_IPconfig) {
-  // Log.verbose(F("WM  : setSTAStaticIPConfig" CR));
-
   memcpy(reinterpret_cast<void*>(&_WiFi_STA_IPconfig),
          reinterpret_cast<const void*>(&WM_STA_IPconfig),
          sizeof(_WiFi_STA_IPconfig));
 }
 
 void ESP_WiFiManager::getSTAStaticIPConfig(WiFi_STA_IPConfig& WM_STA_IPconfig) {
-  // Log.verbose(F("WM  : getSTAStaticIPConfig" CR));
-
   memcpy(reinterpret_cast<void*>(&WM_STA_IPconfig), &_WiFi_STA_IPconfig,
          sizeof(WM_STA_IPconfig));
 }
 
 void ESP_WiFiManager::setMinimumSignalQuality(const int& quality) {
   _minimumQuality = quality;
-}
-
-void ESP_WiFiManager::setBreakAfterConfig(bool shouldBreak) {
-  _shouldBreakAfterConfig = shouldBreak;
 }
 
 void ESP_WiFiManager::reportStatus(String& page) {
@@ -684,7 +603,7 @@ void ESP_WiFiManager::reportStatus(String& page) {
 void ESP_WiFiManager::handleRoot() {
   Log.notice(F("WM  : Webserver, handle root." CR));
 
-  _configPortalTimeout = 0;  
+  _configPortalTimeout = 0;
 
   if (captivePortal()) {
     return;
@@ -729,7 +648,7 @@ void ESP_WiFiManager::handleRoot() {
 void ESP_WiFiManager::handleWifi() {
   Log.notice(F("WM  : WebServer, handle WiFi" CR));
 
-  _configPortalTimeout = 0; 
+  _configPortalTimeout = 0;
   server->sendHeader(FPSTR(WM_HTTP_CACHE_CONTROL), FPSTR(WM_HTTP_NO_STORE));
   server->sendHeader(FPSTR(WM_HTTP_PRAGMA), FPSTR(WM_HTTP_NO_CACHE));
   server->sendHeader(FPSTR(WM_HTTP_EXPIRES), "-1");
@@ -751,8 +670,7 @@ void ESP_WiFiManager::handleWifi() {
     page += FPSTR(WM_FLDSET_START);
 
     for (int i = 0; i < numberOfNetworks; i++) {
-      if (networkIndices[i] == -1)
-        continue;
+      if (networkIndices[i] == -1) continue;
 
       Log.notice(F("WM  : Index = %d" CR), i);
       Log.notice(F("WM  : SSID = %s" CR), WiFi.SSID(networkIndices[i]).c_str());
@@ -942,7 +860,7 @@ void ESP_WiFiManager::handleWifiSave() {
 
   Log.notice(F("WM  : Sent wifi save page" CR));
 
-  connect = true; 
+  connect = true;
   _configPortalTimeout = DEFAULT_PORTAL_TIMEOUT;
 }
 
@@ -1010,14 +928,14 @@ void ESP_WiFiManager::handleInfo() {
 
   page += F("0x");
 #ifdef ESP8266
-  page += String(ESP.getChipId(), HEX); 
-#else // ESP32
+  page += String(ESP.getChipId(), HEX);
+#else  // ESP32
   page += String(ESP_getChipId(), HEX);
 
   page += F("</td></tr>");
   page += F("<tr><td>Chip OUI</td><td>");
   page += F("0x");
-  page += String(getChipOUI(), HEX);  
+  page += String(getChipOUI(), HEX);
 
   page += F("</td></tr>");
   page += F("<tr><td>Chip Model</td><td>");
@@ -1030,8 +948,8 @@ void ESP_WiFiManager::handleInfo() {
   page += F("<tr><td>Flash Chip ID</td><td>");
 
 #ifdef ESP8266
-  page += String(ESP.getFlashChipId(), HEX);  
-#else // ESP32
+  page += String(ESP.getFlashChipId(), HEX);
+#else  // ESP32
   page += F("TODO");
 #endif
 
@@ -1119,7 +1037,7 @@ void ESP_WiFiManager::handleState() {
 void ESP_WiFiManager::handleScan() {
   Log.notice(F("WM  : WebServer, handle scan" CR));
 
-  _configPortalTimeout = 0; 
+  _configPortalTimeout = 0;
 
   // Log.verbose(F("WM  : State-Json" CR));
 
@@ -1136,8 +1054,7 @@ void ESP_WiFiManager::handleScan() {
   String page = F("{\"Access_Points\":[");
 
   for (int i = 0; i < n; i++) {
-    if (indices[i] == -1)
-      continue;  
+    if (indices[i] == -1) continue;
 
     if (i != 0) page += F(", ");
 
@@ -1271,10 +1188,6 @@ void ESP_WiFiManager::setCustomHeadElement(const char* element) {
   _customHeadElement = element;
 }
 
-void ESP_WiFiManager::setRemoveDuplicateAPs(bool removeDuplicates) {
-  _removeDuplicateAPs = removeDuplicates;
-}
-
 int ESP_WiFiManager::scanWifiNetworks(int** indicesptr) {
   Log.notice(F("WM  : Scanning Network" CR));
 
@@ -1312,20 +1225,18 @@ int ESP_WiFiManager::scanWifiNetworks(int** indicesptr) {
     }
 
     // Log.verbose(F("WM  : Removing Dup" CR));
-    if (_removeDuplicateAPs) {
-      String cssid;
+    String cssid;
 
-      for (int i = 0; i < n; i++) {
-        if (indices[i] == -1) continue;
+    for (int i = 0; i < n; i++) {
+      if (indices[i] == -1) continue;
 
-        cssid = WiFi.SSID(indices[i]);
+      cssid = WiFi.SSID(indices[i]);
 
-        for (int j = i + 1; j < n; j++) {
-          if (cssid == WiFi.SSID(indices[j])) {
-            Log.verbose(F("WM  : DUP AP: %s" CR),
-                        WiFi.SSID(indices[j]).c_str());
-            indices[j] = -1;  // set dup aps to index -1
-          }
+      for (int j = i + 1; j < n; j++) {
+        if (cssid == WiFi.SSID(indices[j])) {
+          Log.verbose(F("WM  : DUP AP: %s" CR),
+                      WiFi.SSID(indices[j]).c_str());
+          indices[j] = -1;  // set dup aps to index -1
         }
       }
     }

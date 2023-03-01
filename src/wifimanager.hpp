@@ -51,18 +51,11 @@ extern "C" {
 }
 #define ESP_getChipId() (ESP.getChipId())
 #else  // ESP32
-
 #include <esp_wifi.h>
-
 uint32_t getChipID();
 uint32_t getChipOUI();
-
-#if defined(ESP_getChipId)
-#undef ESP_getChipId
-#endif
-
-#define ESP_getChipId() getChipID()    // ((uint32_t)ESP.getEfuseMac())
-#define ESP_getChipOUI() getChipOUI()  // ((uint32_t)ESP.getEfuseMac())
+#define ESP_getChipId() getChipID()
+#define ESP_getChipOUI() getChipOUI()
 #endif
 
 typedef struct {
@@ -196,17 +189,23 @@ class ESP_WMParameter {
                   const char* custom = "",
                   const int& labelPlacement = WFM_LABEL_BEFORE);
   explicit ESP_WMParameter(const WMParam_Data& WMParam_data);
-  ~ESP_WMParameter();
-
-  void setWMParam_Data(const WMParam_Data& WMParam_data);
-  void getWMParam_Data(WMParam_Data& WMParam_data);
-
-  const char* getID();
-  const char* getValue();
-  const char* getPlaceholder();
-  int getValueLength();
-  int getLabelPlacement();
-  const char* getCustomHTML();
+  ~ESP_WMParameter() {
+    if (_WMParam_data._value != NULL) {
+      delete[] _WMParam_data._value;
+    }
+  }
+  void setWMParam_Data(const WMParam_Data& WMParam_data) {
+    memcpy(&_WMParam_data, &WMParam_data, sizeof(_WMParam_data));
+  }
+  void getWMParam_Data(WMParam_Data& WMParam_data) {
+    memcpy(&WMParam_data, &_WMParam_data, sizeof(WMParam_data));
+  }
+  const char* getValue() { return _WMParam_data._value; }
+  const char* getID() { return _WMParam_data._id; }
+  const char* getPlaceholder() { return _WMParam_data._placeholder; }
+  int getValueLength() { return _WMParam_data._length; }
+  int getLabelPlacement() { return _WMParam_data._labelPlacement; }
+  const char* getCustomHTML() { return _customHTML; }
 
  private:
   WMParam_Data _WMParam_data;
@@ -229,13 +228,12 @@ class ESP_WiFiManager {
   bool autoConnect(char const* apName, char const* apPassword = NULL);
   bool startConfigPortal();
   bool startConfigPortal(char const* apName, char const* apPassword = NULL);
-  String getConfigPortalSSID();
-  String getConfigPortalPW();
+  String getConfigPortalSSID() { return _apName; }
+  String getConfigPortalPW() { return _apPassword; }
   void resetSettings();
   void setConfigPortalTimeout(const uint32_t& seconds);
   void setTimeout(const uint32_t& seconds);
   void setConnectTimeout(const uint32_t& seconds);
-  void setDebugOutput(bool debug);
   void setMinimumSignalQuality(const int& quality = 8);
   int setConfigPortalChannel(const int& channel = 1);
   void setAPStaticIPConfig(const IPAddress& ip, const IPAddress& gw,
@@ -249,10 +247,7 @@ class ESP_WiFiManager {
   void setAPCallback(void (*func)(ESP_WiFiManager*));
   void setSaveConfigCallback(void (*func)());
   bool addParameter(ESP_WMParameter* p);
-
-  void setBreakAfterConfig(bool shouldBreak);
   void setCustomHeadElement(const char* element);
-  void setRemoveDuplicateAPs(bool removeDuplicates);
   int scanWifiNetworks(int** indicesptr);
   void setCredentials(const char* ssid, const char* pwd, const char* ssid1,
                       const char* pwd1) {
@@ -262,7 +257,7 @@ class ESP_WiFiManager {
     _pass1 = String(pwd1);
   }
 
-  inline void setCredentials(String& ssid, String& pwd, String& ssid1,
+  void setCredentials(String& ssid, String& pwd, String& ssid1,
                              String& pwd1) {
     _ssid = ssid;
     _pass = pwd;
@@ -270,10 +265,10 @@ class ESP_WiFiManager {
     _pass1 = pwd1;
   }
 
-  inline String getSSID() { return _ssid; }
-  inline String getPW() { return _pass; }
-  inline String getSSID1() { return _ssid1; }
-  inline String getPW1() { return _pass1; }
+  String getSSID() { return _ssid; }
+  String getPW() { return _pass; }
+  String getSSID1() { return _ssid1; }
+  String getPW1() { return _pass1; }
 
 #define MAX_WIFI_CREDENTIALS 2
 
@@ -345,7 +340,6 @@ class ESP_WiFiManager {
 
   char* getRFC952_hostname(const char* iHostname);
   void setupConfigPortal();
-  void startWPS();
 
   const char* _apName = "no-net";
   const char* _apPassword = NULL;
@@ -375,9 +369,6 @@ class ESP_WiFiManager {
 
   int _paramsCount = 0;
   int _minimumQuality = -1;
-  bool _removeDuplicateAPs = true;
-  bool _shouldBreakAfterConfig = false;
-  bool _tryWPS = false;
 
   const char* _customHeadElement = "";
   int status = WL_IDLE_STATUS;
@@ -405,8 +396,6 @@ class ESP_WiFiManager {
 
   bool connect;
   bool stopConfigPortal = false;
-
-  bool _debug = false;  // true;
 
   void (*_apcallback)(ESP_WiFiManager*) = NULL;
   void (*_savecallback)() = NULL;
