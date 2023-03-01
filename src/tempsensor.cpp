@@ -36,7 +36,7 @@ DallasTemperature mySensors(&myOneWire);
 TempSensor myTempSensor;
 
 void TempSensor::setup() {
-#if LOG_LEVEL == 6 && !defined(TSEN_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("TSEN: Looking for temp sensors." CR));
 #endif
   mySensors.begin();
@@ -52,7 +52,7 @@ void TempSensor::setup() {
   // Set the temp sensor adjustment values
   _tempSensorAdjC = myConfig.getTempSensorAdjC();
 
-#if LOG_LEVEL == 6 && !defined(TSEN_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("TSEN: Adjustment values for temp sensor %F C." CR),
               _tempSensorAdjC);
 #endif
@@ -63,7 +63,7 @@ float TempSensor::getValue(bool useGyro) {
     // When using the gyro temperature only the first read value will be
     // accurate so we will use this for processing.
     float c = myGyro.getInitialSensorTempC();
-#if LOG_LEVEL == 6 && !defined(TSEN_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.verbose(F("TSEN: Reciving temp value for gyro sensor %F C." CR), c);
 #endif
     _hasSensor = true;
@@ -72,9 +72,7 @@ float TempSensor::getValue(bool useGyro) {
 
   // If we dont have sensors just return 0
   if (!mySensors.getDS18Count()) {
-#if !defined(TSEN_DISABLE_LOGGING)
-    Log.notice(F("TSEN: No temperature sensors found. Skipping read." CR));
-#endif
+    // Log.notice(F("TSEN: No temperature sensors found. Skipping read." CR));
     return -273;
   }
 
@@ -87,7 +85,7 @@ float TempSensor::getValue(bool useGyro) {
   if (mySensors.getDS18Count() >= 1) {
     c = mySensors.getTempCByIndex(0);
 
-#if LOG_LEVEL == 6 && !defined(TSEN_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.verbose(F("TSEN: Reciving temp value for DS18B20 sensor %F C." CR), c);
 #endif
     _hasSensor = true;

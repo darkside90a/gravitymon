@@ -35,14 +35,9 @@ SOFTWARE.
 #include <main.hpp>
 #include <wifi.hpp>
 
-// Settings for WIFI Manager
-#define USE_ESP_WIFIMANAGER_NTP false
 #define USE_CLOUDFLARE_NTP false
-#define USING_CORS_FEATURE false
 #define NUM_WIFI_CREDENTIALS 1
-#define USE_STATIC_IP_CONFIG_IN_CP false
-// #define _WIFIMGR_LOGLEVEL_ 4
-#include <ESP_WiFiManager.h>
+#include <wifimanager.hpp>
 ESP_WiFiManager *myWifiManager = 0;
 WifiConnection myWifi;
 
@@ -374,7 +369,7 @@ bool WifiConnection::updateFirmware() {
 }
 
 void WifiConnection::downloadFile(HTTPClient &http, String &fname) {
-#if LOG_LEVEL == 6 && !defined(WIFI_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WIFI: Download file %s." CR), fname);
 #endif
   int httpResponseCode = http.GET();
@@ -390,7 +385,7 @@ void WifiConnection::downloadFile(HTTPClient &http, String &fname) {
 }
 
 bool WifiConnection::checkFirmwareVersion() {
-#if LOG_LEVEL == 6 && !defined(WIFI_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WIFI: Checking if new version exist." CR));
 #endif
   WiFiClient wifi;
@@ -416,14 +411,14 @@ bool WifiConnection::checkFirmwareVersion() {
     Log.notice(F("WIFI: Found version.json, response=%d" CR), httpResponseCode);
 
     String payload = http.getString();
-#if LOG_LEVEL == 6 && !defined(WIFI_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.verbose(F("WIFI: Payload %s." CR), payload.c_str());
 #endif
     DeserializationError err = deserializeJson(ver, payload);
     if (err) {
       writeErrorLog("WIFI: Failed to parse version.json");
     } else {
-#if LOG_LEVEL == 6 && !defined(WIFI_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
       Log.verbose(F("WIFI: Project %s version %s." CR),
                   (const char *)ver["project"], (const char *)ver["version"]);
 #endif
@@ -432,7 +427,7 @@ bool WifiConnection::checkFirmwareVersion() {
 
       if (parseFirmwareVersionString(newVer, (const char *)ver["version"])) {
         if (parseFirmwareVersionString(curVer, CFG_APPVER)) {
-#if LOG_LEVEL == 6 && !defined(WIFI_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
           Log.verbose(F("WIFI: OTA checking new=%d.%d.%d cur=%d.%d.%d" CR),
                       newVer[0], newVer[1], newVer[2], curVer[0], curVer[1],
                       curVer[2]);
@@ -481,7 +476,7 @@ bool WifiConnection::checkFirmwareVersion() {
 
 bool WifiConnection::parseFirmwareVersionString(int (&num)[3],
                                                 const char *version) {
-#if LOG_LEVEL == 6 && !defined(WIFI_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WIFI: Parsing version number string %s." CR), version);
 #endif
   char temp[80];

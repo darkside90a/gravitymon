@@ -47,7 +47,7 @@ Config::Config() {
   snprintf(&buf[0], sizeof(buf), "" WIFI_MDNS "%s", getID());
   _mDNS = String(&buf[0]);
 
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("CFG : Created config for %s (%s)." CR), _id.c_str(),
               _mDNS.c_str());
 #endif
@@ -132,13 +132,13 @@ void Config::createJson(DynamicJsonDocument& doc) {
 //
 bool Config::saveFile() {
   if (!_saveNeeded) {
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.verbose(F("CFG : Skipping save, not needed." CR));
 #endif
     return true;
   }
 
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("CFG : Saving configuration to file." CR));
 #endif
 
@@ -152,7 +152,7 @@ bool Config::saveFile() {
   DynamicJsonDocument doc(3000);
   createJson(doc);
 
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
@@ -170,7 +170,7 @@ bool Config::saveFile() {
 // Load config file from disk
 //
 bool Config::loadFile() {
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("CFG : Loading configuration from file." CR));
 #endif
 
@@ -350,7 +350,7 @@ void Config::formatFileSystem() {
 // Check if file system can be mounted, if not we format it.
 //
 void Config::checkFileSystem() {
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("CFG : Checking if filesystem is valid." CR));
 #endif
 
@@ -363,7 +363,7 @@ void Config::checkFileSystem() {
 }
 
 bool AdvancedConfig::saveFile() {
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("CFG : Saving hardware configuration to file." CR));
 #endif
 
@@ -392,7 +392,7 @@ bool AdvancedConfig::saveFile() {
   doc[PARAM_HW_IGNORE_LOW_ANGLES] = this->isIgnoreLowAnges();
   doc[PARAM_HW_BATTERY_SAVING] = this->isBatterySaving();
 
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
@@ -406,7 +406,7 @@ bool AdvancedConfig::saveFile() {
 }
 
 bool AdvancedConfig::loadFile() {
-#if LOG_LEVEL == 6 && !defined(DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("CFG : Loading hardware configuration from file." CR));
 #endif
 

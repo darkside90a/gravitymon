@@ -69,20 +69,16 @@ void checkSleepMode(float angle, float volt) {
 
   if (!myConfig.hasGyroCalibration()) {
     // Will not enter sleep mode if: no calibration data
-#if !defined(MAIN_DISABLE_LOGGING)
-    Log.notice(
+    Log.verbose(
         F("MAIN: Missing calibration data, so forcing webserver to be "
           "active." CR));
-#endif
     runMode = RunMode::configurationMode;
   } else if (!myGyro.hasValue() || !myGyro.isConnected()) {
     runMode = RunMode::configurationMode;
   } else if (sleepModeAlwaysSkip) {
     // Check if the flag from the UI has been set, the we force configuration
     // mode.
-#if !defined(MAIN_DISABLE_LOGGING)
-    Log.notice(F("MAIN: Sleep mode disabled from web interface." CR));
-#endif
+    Log.verbose(F("MAIN: Sleep mode disabled from web interface." CR));
     runMode = RunMode::configurationMode;
   } else if ((volt < myConfig.getVoltageConfig() &&
               (angle > 85 && angle < 95)) ||
@@ -96,23 +92,17 @@ void checkSleepMode(float angle, float volt) {
 
   switch (runMode) {
     case RunMode::configurationMode:
-#if !defined(MAIN_DISABLE_LOGGING)
-      Log.notice(F("MAIN: run mode CONFIG (angle=%F volt=%F)." CR), angle,
-                 volt);
-#endif
+      Log.verbose(F("MAIN: run mode CONFIG (angle=%F volt=%F)." CR), angle,
+                  volt);
       break;
     case RunMode::wifiSetupMode:
       break;
     case RunMode::gravityMode:
-#if !defined(MAIN_DISABLE_LOGGING)
-      Log.notice(F("MAIN: run mode GRAVITY (angle=%F volt=%F)." CR), angle,
-                 volt);
-#endif
+      Log.verbose(F("MAIN: run mode GRAVITY (angle=%F volt=%F)." CR), angle,
+                  volt);
       break;
     case RunMode::storageMode:
-#if !defined(MAIN_DISABLE_LOGGING)
-      Log.notice(F("MAIN: run mode STORAGE (angle=%F)." CR), angle);
-#endif
+      Log.verbose(F("MAIN: run mode STORAGE (angle=%F)." CR), angle);
       break;
   }
 
@@ -270,7 +260,7 @@ void setup() {
 bool loopReadGravity() {
   float angle = 0;
 
-#if LOG_LEVEL == 6 && !defined(MAIN_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("Main: Entering main loopGravity." CR));
 #endif
 
@@ -295,7 +285,7 @@ bool loopReadGravity() {
       gravitySG = corrGravitySG;
     }
 
-#if LOG_LEVEL == 6 && !defined(MAIN_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.verbose(F("Main: Sensor values gyro angle=%F, temp=%FC, gravity=%F, "
                   "corr_gravity=%F." CR),
                 angle, tempC, gravitySG, corrGravitySG);

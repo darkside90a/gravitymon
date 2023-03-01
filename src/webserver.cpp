@@ -100,7 +100,7 @@ void WebServerHandler::webHandleConfig() {
   doc[PARAM_PLATFORM] = "esp32";
 #endif
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
@@ -119,7 +119,7 @@ void WebServerHandler::webHandleUploadFile() {
   HTTPUpload& upload = _server->upload();
   String f = upload.filename;
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : webServer callback for /api/upload, receiving file %s, "
                 "%d(%d)." CR),
               f.c_str(), upload.currentSize, upload.totalSize);
@@ -314,7 +314,7 @@ void WebServerHandler::webHandleStatus() {
           ? true
           : false;
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
@@ -360,7 +360,7 @@ void WebServerHandler::webHandleStatusSleepmode() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -385,7 +385,7 @@ void WebServerHandler::webHandleConfigDevice() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -413,7 +413,7 @@ void WebServerHandler::webHandleConfigPush() {
     LOG_PERF_STOP("webserver-api-config-push");
     return;
   }
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -491,7 +491,7 @@ void WebServerHandler::webHandleConfigGravity() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -525,7 +525,7 @@ void WebServerHandler::webHandleConfigHardware() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -576,7 +576,7 @@ void WebServerHandler::webHandleConfigAdvancedWrite() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -673,7 +673,7 @@ void WebServerHandler::webHandleConfigAdvancedRead() {
   doc[PARAM_HW_IGNORE_LOW_ANGLES] = myAdvancedConfig.isIgnoreLowAnges();
   doc[PARAM_HW_BATTERY_SAVING] = myAdvancedConfig.isBatterySaving();
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
@@ -693,7 +693,7 @@ void WebServerHandler::webHandleFormulaRead() {
   DynamicJsonDocument doc(500);
   const RawFormulaData& fd = myConfig.getFormulaData();
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -756,7 +756,7 @@ void WebServerHandler::webHandleFormulaRead() {
     doc["g10"] = reduceFloatPrecision(fd.g[9], DECIMALS_SG);
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
@@ -782,7 +782,7 @@ void WebServerHandler::webHandleConfigFormatWrite() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
   bool success = false;
@@ -825,7 +825,7 @@ void WebServerHandler::webHandleTestPush() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 
@@ -872,7 +872,7 @@ void WebServerHandler::webHandleTestPush() {
   serializeJson(doc, out);
   doc.clear();
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
@@ -964,7 +964,7 @@ void WebServerHandler::webHandleConfigFormatRead() {
 
   out += "\"}";
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   EspSerial.print(out.c_str());
   EspSerial.print(CR);
 #endif
@@ -986,7 +986,7 @@ void WebServerHandler::webHandleFormulaWrite() {
     return;
   }
 
-#if LOG_LEVEL == 6 && !defined(WEB_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("WEB : %s." CR), getRequestArguments().c_str());
 #endif
 

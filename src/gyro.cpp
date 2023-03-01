@@ -56,7 +56,7 @@ bool GyroSensor::setup() {
     delay(300);
   }*/
 
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Setting up hardware." CR));
 #endif
   Wire.begin(PIN_SDA, PIN_SCL);
@@ -68,9 +68,7 @@ bool GyroSensor::setup() {
     writeErrorLog("GYRO: Failed to connect to gyro, is it connected?");
     _sensorConnected = false;
   } else {
-#if !defined(GYRO_DISABLE_LOGGING)
-    Log.notice(F("GYRO: Connected to MPU6050 (gyro)." CR));
-#endif
+    // Log.notice(F("GYRO: Connected to MPU6050 (gyro)." CR));
     accelgyro.initialize();
     _sensorConnected = true;
 
@@ -96,7 +94,7 @@ bool GyroSensor::setup() {
 }
 
 void GyroSensor::enterSleep() {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Setting up hardware." CR));
 #endif
 #if defined(FLOATY)
@@ -110,7 +108,7 @@ void GyroSensor::readSensor(RawGyroData &raw, const int noIterations,
                             const int delayTime) {
   RawGyroDataL average = {0, 0, 0, 0, 0, 0};
 
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Reading sensor with %d iterations %d us delay." CR),
               noIterations, delayTime);
 #endif
@@ -174,7 +172,7 @@ void GyroSensor::readSensor(RawGyroData &raw, const int noIterations,
   raw.gz = average.gz / noIterations;
   raw.temp = average.temp / noIterations;
 
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
 #if defined(GYRO_SHOW_MINMAX)
   Log.verbose(F("GYRO: Min    \t%d\t%d\t%d\t%d\t%d\t%d\t%d." CR), min.ax,
               min.ay, min.az, min.gx, min.gy, min.gz, min.temp);
@@ -193,7 +191,7 @@ void GyroSensor::readSensor(RawGyroData &raw, const int noIterations,
 }
 
 float GyroSensor::calculateAngle(RawGyroData &raw) {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Calculating the angle." CR));
 #endif
 
@@ -211,7 +209,7 @@ float GyroSensor::calculateAngle(RawGyroData &raw) {
   // float vZ = (acos(abs(az) / sqrt(ax * ax + ay * ay + az * az)) * 180.0 /
   // PI); float vX = (acos(abs(ax) / sqrt(ax * ax + ay * ay + az * az)) * 180.0
   // / PI);
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   // Log.notice(F("GYRO: angleX= %F." CR), vX);
   Log.notice(F("GYRO: angleY= %F." CR), vY);
   // Log.notice(F("GYRO: angleZ= %F." CR), vZ);
@@ -220,7 +218,7 @@ float GyroSensor::calculateAngle(RawGyroData &raw) {
 }
 
 bool GyroSensor::isSensorMoving(RawGyroData &raw) {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Checking for sensor movement." CR));
 #endif
 
@@ -237,7 +235,7 @@ bool GyroSensor::isSensorMoving(RawGyroData &raw) {
 }
 
 bool GyroSensor::read() {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Getting new gyro position." CR));
 #endif
 
@@ -251,14 +249,14 @@ bool GyroSensor::read() {
   // If the sensor is unstable we return false to signal we dont have valid
   // value
   if (isSensorMoving(_lastGyroData)) {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.notice(F("GYRO: Sensor is moving." CR));
 #endif
     _validValue = false;
   } else {
     _validValue = true;
     _angle = calculateAngle(_lastGyroData);
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.verbose(F("GYRO: Sensor values %d,%d,%d\t%F" CR), _lastGyroData.ax,
                 _lastGyroData.ay, _lastGyroData.az, _angle);
 #endif
@@ -275,7 +273,7 @@ bool GyroSensor::read() {
 }
 
 void GyroSensor::dumpCalibration() {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Accel offset\t%d\t%d\t%d" CR), _calibrationOffset.ax,
               _calibrationOffset.ay, _calibrationOffset.az);
   Log.verbose(F("GYRO: Gyro offset \t%d\t%d\t%d" CR), _calibrationOffset.gx,
@@ -284,7 +282,7 @@ void GyroSensor::dumpCalibration() {
 }
 
 void GyroSensor::applyCalibration() {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Applying calibration offsets to sensor." CR));
 #endif
 
@@ -305,7 +303,7 @@ void GyroSensor::applyCalibration() {
 }
 
 void GyroSensor::calibrateSensor() {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Calibrating sensor" CR));
 #endif
   // accelgyro.PrintActiveOffsets();
@@ -330,7 +328,7 @@ void GyroSensor::calibrateSensor() {
 }
 
 void GyroSensor::debug() {
-#if LOG_LEVEL == 6 && !defined(GYRO_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("GYRO: Debug - Clock src   %d." CR),
               accelgyro.getClockSource());
   Log.verbose(F("GYRO: Debug - Device ID   %d." CR), accelgyro.getDeviceID());

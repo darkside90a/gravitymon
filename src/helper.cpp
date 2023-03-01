@@ -325,7 +325,7 @@ void printHeap(String prefix) {
 }
 
 void deepSleep(int t) {
-#if LOG_LEVEL == 6 && !defined(HELPER_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("HELP: Entering sleep mode for %ds." CR), t);
 #endif
   uint32_t wake = t * 1000000;
@@ -422,7 +422,7 @@ void BatteryVoltage::read() {
 #else  // defined (ESP32)
   _batteryLevel = ((3.3 / 4095) * v) * factor;
 #endif
-#if LOG_LEVEL == 6 && !defined(HELPER_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(
       F("BATT: Reading voltage level. Factor=%F Value=%d, Voltage=%F." CR),
       factor, v, _batteryLevel);
@@ -547,7 +547,7 @@ void PerfLogging::pushInflux() {
 
   body += &buf[0];
 
-#if LOG_LEVEL == 6 && !defined(HELPER_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("PERF: url %s." CR), serverPath.c_str());
   Log.verbose(F("PERF: data %s." CR), body.c_str());
 #endif
@@ -559,11 +559,9 @@ void PerfLogging::pushInflux() {
   int httpResponseCode = http.POST(body);
 
   if (httpResponseCode == 204) {
-#if !defined(HELPER_DISABLE_LOGGING)
-    Log.notice(
+    Log.verbose(
         F("PERF: InfluxDB2 push performance data successful, response=%d" CR),
         httpResponseCode);
-#endif
   } else {
     Log.error(F("PERF: InfluxDB2 push performance data failed, response=%d" CR),
               httpResponseCode);

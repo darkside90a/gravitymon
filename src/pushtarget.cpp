@@ -60,10 +60,8 @@ void PushIntervalTracker::load() {
     intFile.close();
   }
 
-#if !defined(PUSH_DISABLE_LOGGING)
   Log.verbose(F("PUSH: Parsed trackers: %d:%d:%d:%d:%d." CR), _counters[0],
               _counters[1], _counters[2], _counters[3], _counters[4]);
-#endif
 }
 
 //
@@ -78,9 +76,7 @@ void PushIntervalTracker::save() {
 
   // If this feature is disabled we skip saving the file
   if (!myAdvancedConfig.isPushIntervalActive()) {
-#if !defined(PUSH_DISABLE_LOGGING)
-    Log.notice(F("PUSH: Variabled push interval disabled." CR));
-#endif
+    // Log.verbose(F("PUSH: Variabled push interval disabled." CR));
     LittleFS.remove(PUSHINT_FILENAME);
   } else {
     Log.notice(
@@ -180,9 +176,7 @@ void PushTarget::probeMaxFragement(String& serverPath) {
 // Send to influx db v2
 //
 void PushTarget::sendInfluxDb2(TemplatingEngine& engine, bool isSecure) {
-#if !defined(PUSH_DISABLE_LOGGING)
-  Log.notice(F("PUSH: Sending values to influxdb2." CR));
-#endif
+  // Log.verbose(F("PUSH: Sending values to influxdb2." CR));
   _lastCode = 0;
   _lastSuccess = false;
 
@@ -192,7 +186,7 @@ void PushTarget::sendInfluxDb2(TemplatingEngine& engine, bool isSecure) {
       "&bucket=" + String(myConfig.getInfluxDb2PushBucket());
   String doc = engine.create(TemplatingEngine::TEMPLATE_INFLUX);
 
-#if LOG_LEVEL == 6 && !defined(PUSH_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), serverPath.c_str());
   Log.verbose(F("PUSH: data %s." CR), doc.c_str());
 #endif
@@ -266,10 +260,8 @@ void PushTarget::addHttpHeader(HTTPClient& http, String header) {
 //
 void PushTarget::sendHttpPost(TemplatingEngine& engine, bool isSecure,
                               int index) {
-#if !defined(PUSH_DISABLE_LOGGING)
-  Log.notice(F("PUSH: Sending values to http (%s)" CR),
-             index ? "http2" : "http");
-#endif
+  // Log.notice(F("PUSH: Sending values to http (%s)" CR), index ? "http2" :
+  // "http");
   _lastCode = 0;
   _lastSuccess = false;
 
@@ -283,7 +275,7 @@ void PushTarget::sendHttpPost(TemplatingEngine& engine, bool isSecure,
     doc = engine.create(TemplatingEngine::TEMPLATE_HTTP2);
   }
 
-#if LOG_LEVEL == 6 && !defined(PUSH_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), serverPath.c_str());
   Log.verbose(F("PUSH: json %s." CR), doc.c_str());
 #endif
@@ -351,9 +343,7 @@ void PushTarget::sendHttpPost(TemplatingEngine& engine, bool isSecure,
 // Send data to http target using GET
 //
 void PushTarget::sendHttpGet(TemplatingEngine& engine, bool isSecure) {
-#if !defined(PUSH_DISABLE_LOGGING)
-  Log.notice(F("PUSH: Sending values to http3" CR));
-#endif
+  // Log.verbose(F("PUSH: Sending values to http3" CR));
   _lastCode = 0;
   _lastSuccess = false;
 
@@ -362,7 +352,7 @@ void PushTarget::sendHttpGet(TemplatingEngine& engine, bool isSecure) {
   serverPath = myConfig.getHttp3Url();
   serverPath += engine.create(TemplatingEngine::TEMPLATE_HTTP3);
 
-#if LOG_LEVEL == 6 && !defined(PUSH_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), serverPath.c_str());
 #endif
 
@@ -411,10 +401,8 @@ void PushTarget::sendHttpGet(TemplatingEngine& engine, bool isSecure) {
 //
 void PushTarget::sendMqtt(TemplatingEngine& engine, bool isSecure,
                           bool skipHomeAssistantRegistration) {
-#if !defined(PUSH_DISABLE_LOGGING)
-  Log.notice(F("PUSH: Sending values to mqtt. Skip HA registration=%s" CR),
-             skipHomeAssistantRegistration ? "yes" : "no");
-#endif
+  // Log.verbose(F("PUSH: Sending values to mqtt. Skip HA registration=%s" CR),
+  // skipHomeAssistantRegistration ? "yes" : "no");
   _lastCode = 0;
   _lastSuccess = false;
 
@@ -454,7 +442,7 @@ void PushTarget::sendMqtt(TemplatingEngine& engine, bool isSecure,
   mqtt.connect(myConfig.getMDNS(), myConfig.getMqttUser(),
                myConfig.getMqttPass());
 
-#if LOG_LEVEL == 6 && !defined(PUSH_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), myConfig.getMqttUrl());
   Log.verbose(F("PUSH: data %s." CR), doc.c_str());
 #endif
@@ -474,7 +462,7 @@ void PushTarget::sendMqtt(TemplatingEngine& engine, bool isSecure,
     // Each line equals one topic post, format is <topic>:<value>
     String topic = line.substring(0, line.indexOf(":"));
     String value = line.substring(line.indexOf(":") + 1);
-#if LOG_LEVEL == 6 && !defined(PUSH_DISABLE_LOGGING)
+#if LOG_LEVEL == 6
     Log.verbose(F("PUSH: topic '%s', value '%s'." CR), topic.c_str(),
                 value.c_str());
 #endif
